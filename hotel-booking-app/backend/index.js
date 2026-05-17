@@ -20,7 +20,9 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 
 app.use(cors({
   credentials: true,
-  origin: 'http://localhost:5173',
+  origin: [
+  'http://localhost:5173',
+],
 }));
 
 // ================= DB =================
@@ -38,6 +40,8 @@ app.use('/api', wishlistRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 
 // ================= START =================
-app.listen(4000, () => {
-  console.log("Server running on port 4000 🚀");
+const PORT = process.env.PORT || 4000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} 🚀`);
 });
