@@ -2,8 +2,7 @@
 
 This repository contains the backend (API) and frontend (Client) for a Hotel Booking MERN (MongoDB, Express.js, React.js, Node.js) stack project.
 
-# YOUTUBE VIDEO DEMO 
-[![HotelBazaar Demo](https://img.youtube.com/vi/LQsNhul80UY/0.jpg)](https://www.youtube.com/watch?v=LQsNhul80UY)
+
 
 ## Backend (API)
 
