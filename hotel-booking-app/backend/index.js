@@ -24,6 +24,7 @@ app.use(cors({
     'http://localhost:5173',
     'https://hotel-booking-app-lemon-three.vercel.app'
   ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
 }));
 // ================= DB =================
 mongoose.connect(process.env.MONGO_URL)
