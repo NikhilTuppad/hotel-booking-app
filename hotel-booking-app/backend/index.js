@@ -21,10 +21,10 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 app.use(cors({
   credentials: true,
   origin: [
-  'http://localhost:5173',
-],
+    'http://localhost:5173',
+    'https://hotel-booking-app-lemon-three.vercel.app'
+  ],
 }));
-
 // ================= DB =================
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log("MongoDB connected ✅"))
