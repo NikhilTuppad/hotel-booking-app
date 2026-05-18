@@ -1,6 +1,5 @@
 const Booking = require('../models/Booking');
 const User = require('../models/User');
-const { sendEmail } = require('../utils/mailer');
 const { getUserDataFromReq } = require('../middleware/authMiddleware');
 
 const getBookingsByPlace = async (req, res) => {
@@ -13,6 +12,7 @@ const getBookingsByPlace = async (req, res) => {
 
 const createBooking = async (req, res) => {
   try {
+    console.log("[Booking] 1. Request received for new booking.");
     const userData = await getUserDataFromReq(req);
     const {
       place, checkIn, checkOut,
@@ -31,6 +31,7 @@ const createBooking = async (req, res) => {
     });
 
     if (existingBookings.length > 0) {
+      console.log("[Booking] 2. Dates already booked.");
       return res.status(400).json({
         error: "This place is already booked for selected dates",
       });
@@ -41,27 +42,14 @@ const createBooking = async (req, res) => {
       user: userData.id, status: "booked", refundAmount: 0,
     });
 
-    try {
-      await sendEmail({
-        from: process.env.EMAIL_USER || '"HotelBazaar" <noreply@hotelbazaar.com>',
-        to: userData.email,
-        subject: 'Booking Confirmed - HotelBazaar',
-        html: `
-          <h2>Booking Confirmed ✅</h2>
-          <p>Your hotel booking has been confirmed successfully.</p>
-          <p><strong>Check-In:</strong> ${checkIn}</p>
-          <p><strong>Check-Out:</strong> ${checkOut}</p>
-          <p><strong>Total Price:</strong> ₹${price}</p>
-          <p>Thank you for choosing HotelBazaar 🏨</p>
-        `,
-      });
-    } catch (emailErr) {
-      console.error("Failed to send confirmation email:", emailErr);
-    }
+    console.log("[Booking] 3. DB saved successfully. Booking ID:", bookingDoc._id);
 
+    // Immediately return success response so frontend gets instant confirmation
     res.json(bookingDoc);
+    console.log("[Booking] 4. API Response sent to frontend instantly.");
+
   } catch (err) {
-    console.error("Booking Error:", err);
+    console.error("[Booking] Booking Error ❌:", err);
     res.status(500).json('Failed to create booking');
   }
 };
@@ -77,9 +65,16 @@ const getBookings = async (req, res) => {
 
 const cancelBooking = async (req, res) => {
   try {
+    console.log(`[Cancellation] 1. Request received for booking ID: ${req.params.id}`);
     const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json('Booking not found');
-    if (booking.status === 'cancelled') return res.status(400).json('Already cancelled');
+    if (!booking) {
+      console.log("[Cancellation] 2. Booking not found.");
+      return res.status(404).json('Booking not found');
+    }
+    if (booking.status === 'cancelled') {
+      console.log("[Cancellation] 2. Already cancelled.");
+      return res.status(400).json('Already cancelled');
+    }
 
     const now = new Date();
     const checkInDate = new Date(booking.checkIn);
@@ -92,28 +87,14 @@ const cancelBooking = async (req, res) => {
     booking.status = 'cancelled';
     booking.refundAmount = refund;
     await booking.save();
+    console.log("[Cancellation] 3. DB updated successfully.");
 
-    const user = await User.findById(booking.user);
-    
-    try {
-      await sendEmail({
-        from: process.env.EMAIL_USER || '"HotelBazaar" <noreply@hotelbazaar.com>',
-        to: user.email,
-        subject: 'Booking Cancelled - HotelBazaar',
-        html: `
-          <h2>Booking Cancelled ❌</h2>
-          <p>Your booking has been cancelled successfully.</p>
-          <p><strong>Refund Amount:</strong> ₹${refund}</p>
-          <p>We hope to serve you again.</p>
-        `,
-      });
-    } catch (emailErr) {
-      console.error("Failed to send cancellation email:", emailErr);
-    }
-
+    // Immediately return success response for instant cancellation
     res.json({ message: 'Booking cancelled', refundAmount: refund });
+    console.log("[Cancellation] 4. API Response sent to frontend instantly.");
+
   } catch (err) {
-    console.error("Cancellation Error:", err);
+    console.error("[Cancellation] Cancellation Error ❌:", err);
     res.status(500).json('Error cancelling booking');
   }
 };

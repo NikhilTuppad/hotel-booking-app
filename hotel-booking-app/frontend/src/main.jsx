@@ -7,7 +7,8 @@ import { BrowserRouter } from 'react-router-dom'
 
 import axios from "axios";
 
-axios.defaults.baseURL = "https://hotel-booking-backend-tbfn.onrender.com/api";
+// Use environment variable if available (e.g. for local dev), otherwise default to Render production URL
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || "https://hotel-booking-backend-tbfn.onrender.com/api";
 axios.defaults.withCredentials = true;
 
 

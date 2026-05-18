@@ -36,7 +36,7 @@ export default function BookingPage() {
         "Booking cancelled successfully!",
         "Failed to cancel booking."
       );
-      setTimeout(() => window.location.reload(), 1500);
+      window.location.reload();
     } catch (err) {
       // Error handled by toast
     }

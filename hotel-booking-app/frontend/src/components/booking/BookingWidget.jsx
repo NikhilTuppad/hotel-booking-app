@@ -89,7 +89,7 @@ export default function BookingWidget({ place }) {
       );
 
       const bookingId = response.data._id;
-      setTimeout(() => setRedirect(`/account/bookings/${bookingId}`), 1500);
+      setRedirect(`/account/bookings/${bookingId}`);
     } catch (err) {
       // error handled by toast
     }
